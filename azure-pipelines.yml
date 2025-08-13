@@ -14,7 +14,6 @@ variables:
   buildConfiguration: 'production'
   
   # Azure App Service variables (update these with your actual values)
-  azureSubscription: 'cb6255863a-vibecode05-az' # Replace with your service connection name
   appServiceName: 'CTS-VibeAppau5403-3' # Replace with your App Service name
 
 stages:
