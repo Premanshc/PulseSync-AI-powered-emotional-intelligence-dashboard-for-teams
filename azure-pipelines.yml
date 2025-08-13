@@ -1,0 +1,119 @@
+# Azure DevOps Pipeline for PulseSync Next.js Application
+# This pipeline builds and deploys the Next.js app to Azure App Service
+
+trigger:
+- main
+- develop
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  # Build variables
+  nodeVersion: '18.x'
+  buildConfiguration: 'production'
+  
+  # Azure App Service variables (update these with your actual values)
+  azureSubscription: 'your-azure-service-connection' # Replace with your service connection name
+  appServiceName: 'pulsesync-app' # Replace with your App Service name
+  resourceGroupName: 'pulsesync-rg' # Replace with your resource group name
+
+stages:
+- stage: Build
+  displayName: 'Build Application'
+  jobs:
+  - job: BuildJob
+    displayName: 'Build PulseSync'
+    steps:
+    - task: NodeTool@0
+      inputs:
+        versionSpec: '$(nodeVersion)'
+      displayName: 'Install Node.js'
+
+    - task: Cache@2
+      inputs:
+        key: 'npm | "$(Agent.OS)" | package-lock.json'
+        restoreKeys: |
+          npm | "$(Agent.OS)"
+          npm
+        path: '$(npm_config_cache)'
+      displayName: 'Cache npm packages'
+
+    - script: |
+        npm ci
+      displayName: 'Install dependencies'
+
+    - script: |
+        npm run lint
+      displayName: 'Run ESLint'
+      continueOnError: true
+
+    - script: |
+        npm run build
+      displayName: 'Build application'
+      env:
+        NODE_ENV: production
+
+    - task: ArchiveFiles@2
+      inputs:
+        rootFolderOrFile: '$(System.DefaultWorkingDirectory)'
+        includeRootFolder: false
+        archiveType: 'zip'
+        archiveFile: '$(Build.ArtifactStagingDirectory)/pulsesync-$(Build.BuildId).zip'
+        replaceExistingArchive: true
+        excludePaths: |
+          node_modules
+          .git
+          .next/cache
+          .env*
+          *.md
+          .gitignore
+          .eslintrc*
+          azure-pipelines.yml
+      displayName: 'Archive application'
+
+    - task: PublishBuildArtifacts@1
+      inputs:
+        pathToPublish: '$(Build.ArtifactStagingDirectory)'
+        artifactName: 'pulsesync-drop'
+        publishLocation: 'Container'
+      displayName: 'Publish build artifacts'
+
+- stage: Deploy
+  displayName: 'Deploy to Azure'
+  dependsOn: Build
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+  jobs:
+  - deployment: DeployJob
+    displayName: 'Deploy PulseSync to Azure App Service'
+    environment: 'production'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - download: current
+            artifact: pulsesync-drop
+            displayName: 'Download build artifacts'
+
+          - task: AzureWebApp@1
+            inputs:
+              azureSubscription: '$(azureSubscription)'
+              appType: 'webAppLinux'
+              appName: '$(appServiceName)'
+              resourceGroupName: '$(resourceGroupName)'
+              package: '$(Pipeline.Workspace)/pulsesync-drop/pulsesync-$(Build.BuildId).zip'
+              runtimeStack: 'NODE|18-lts'
+              startUpCommand: 'npm start'
+            displayName: 'Deploy to Azure App Service'
+
+          - task: AzureAppServiceSettings@1
+            inputs:
+              azureSubscription: '$(azureSubscription)'
+              appName: '$(appServiceName)'
+              resourceGroupName: '$(resourceGroupName)'
+              appSettings: |
+                NODE_ENV=production
+                WEBSITE_NODE_DEFAULT_VERSION=18.17.0
+                SCM_DO_BUILD_DURING_DEPLOYMENT=false
+                ENABLE_ORYX_BUILD=false
+            displayName: 'Configure App Service Settings'
