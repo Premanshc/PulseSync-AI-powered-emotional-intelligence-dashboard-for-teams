@@ -54,7 +54,7 @@ export default function Dashboard() {
           className="text-center"
         >
           <h1 className="text-4xl font-bold text-gray-900 mb-4">Welcome to PulseSync</h1>
-          <p className="text-xl text-gray-600 mb-8">Your team's emotional intelligence dashboard</p>
+          <p className="text-xl text-gray-600 mb-8">Your team&apos;s emotional intelligence dashboard</p>
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}

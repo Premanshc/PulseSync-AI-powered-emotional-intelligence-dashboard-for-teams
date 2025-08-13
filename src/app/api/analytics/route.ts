@@ -4,6 +4,34 @@ import { supabase } from '@/lib/supabase'
 
 export async function GET(request: NextRequest) {
   try {
+    // Demo mode - return mock analytics data
+    const isDemoMode = process.env.NODE_ENV === 'development' || !process.env.SUPABASE_URL || process.env.SUPABASE_URL.includes('demo')
+    
+    if (isDemoMode) {
+      return NextResponse.json({
+        teamMetrics: {
+          averageSentiment: 4.2,
+          engagementScore: 87,
+          wellnessIndex: 78,
+          productivityTrend: 'positive'
+        },
+        sentimentHistory: [
+          { date: '2024-01-01', sentiment: 4.1 },
+          { date: '2024-01-02', sentiment: 4.3 },
+          { date: '2024-01-03', sentiment: 4.2 },
+          { date: '2024-01-04', sentiment: 4.5 },
+          { date: '2024-01-05', sentiment: 4.4 }
+        ],
+        emotionDistribution: {
+          optimistic: 35,
+          focused: 25,
+          collaborative: 20,
+          energetic: 15,
+          calm: 5
+        }
+      })
+    }
+
     const session = await auth()
     
     if (!session) {

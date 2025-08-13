@@ -568,7 +568,7 @@ export default function MeditationPage() {
                 <div className="text-6xl mb-4">🌟</div>
                 <h2 className="text-2xl font-bold text-gray-900 mb-2">Well done!</h2>
                 <p className="text-gray-600 mb-6">
-                  You've completed your {selectedDuration / 60}-minute meditation session.
+                  You&apos;ve completed your {selectedDuration / 60}-minute meditation session.
                   Take this centered energy back to your work.
                 </p>
                 <div className="space-y-3">
@@ -603,7 +603,7 @@ export default function MeditationPage() {
               <li>• Find a comfortable, quiet space</li>
               <li>• Choose ambient sounds to help focus</li>
               <li>• Follow the breathing guide</li>
-              <li>• It's okay if your mind wanders</li>
+              <li>• It&apos;s okay if your mind wanders</li>
               <li>• Focus on the present moment</li>
             </ul>
           </motion.div>

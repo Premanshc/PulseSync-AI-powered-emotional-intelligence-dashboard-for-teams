@@ -5,6 +5,24 @@ import { supabase } from '@/lib/supabase'
 
 export async function POST(request: NextRequest) {
   try {
+    // Demo mode - return mock data
+    const isDemoMode = process.env.NODE_ENV === 'development' || !process.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY.includes('demo')
+    
+    if (isDemoMode) {
+      return NextResponse.json({
+        sentiments: [
+          { emotion: 'optimistic', confidence: 0.85, timestamp: new Date().toISOString() },
+          { emotion: 'focused', confidence: 0.92, timestamp: new Date().toISOString() },
+          { emotion: 'collaborative', confidence: 0.78, timestamp: new Date().toISOString() }
+        ],
+        summary: {
+          averageSentiment: 4.2,
+          dominantEmotion: 'optimistic',
+          teamMorale: 'high'
+        }
+      })
+    }
+
     const session = await auth()
     
     if (!session) {

@@ -445,7 +445,7 @@ export default function BreakTimePage() {
                 <div className="text-7xl mb-4">🎉</div>
                 <h2 className="text-2xl font-bold text-gray-900 mb-2">Break Complete!</h2>
                 <p className="text-gray-600 mb-6">
-                  Great job taking care of yourself! You're now refreshed and ready to tackle your next task with renewed energy.
+                  Great job taking care of yourself! You&apos;re now refreshed and ready to tackle your next task with renewed energy.
                 </p>
                 <div className="space-y-3">
                   <button

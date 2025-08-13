@@ -1,8 +1,8 @@
 import { Redis } from '@upstash/redis'
 
 const redis = new Redis({
-  url: process.env.UPSTASH_REDIS_REST_URL!,
-  token: process.env.UPSTASH_REDIS_REST_TOKEN!,
+  url: process.env.UPSTASH_REDIS_REST_URL || 'redis://localhost:6379',
+  token: process.env.UPSTASH_REDIS_REST_TOKEN || 'placeholder-token',
 })
 
 export async function cacheTeamSentiment(teamId: string, sentimentData: any) {

@@ -6,6 +6,21 @@ import { getCachedUserRecommendations, cacheUserRecommendations } from '@/lib/re
 
 export async function POST(request: NextRequest) {
   try {
+    // Demo mode - return mock recommendations
+    const isDemoMode = process.env.NODE_ENV === 'development' || !process.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY.includes('demo')
+    
+    if (isDemoMode) {
+      return NextResponse.json({
+        wellnessNudge: "Your team is showing great energy today! 🚀 Consider a 15-minute team meditation session to maintain this positive momentum.",
+        motivationalContent: "Today's team collaboration is inspiring! Keep building on this strong foundation of trust and communication.",
+        musicRecommendations: [
+          { name: "Focus Flow", genre: "Ambient", mood: "concentrated" },
+          { name: "Team Energy", genre: "Upbeat", mood: "collaborative" },
+          { name: "Calm Productivity", genre: "Lo-fi", mood: "relaxed" }
+        ]
+      })
+    }
+
     const session = await auth()
     
     if (!session) {

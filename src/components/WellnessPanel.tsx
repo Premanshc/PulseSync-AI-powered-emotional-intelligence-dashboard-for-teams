@@ -113,13 +113,14 @@ export default function WellnessPanel() {
     }
     
     // Select appropriate tip category
-    let timeCategory = 'midday'
+    let timeCategory: 'morning' | 'midday' | 'evening' = 'midday'
     if (currentHour < 12) timeCategory = 'morning'
     else if (currentHour > 17) timeCategory = 'evening'
     
-    let moodCategory = 'medium'
-    if (averageMood > 4) moodCategory = 'high'
-    else if (averageMood < 3) moodCategory = 'low'
+    let moodCategory: 'high' | 'medium' | 'low' = 'medium'
+    const avgMoodValue = parseFloat(averageMood as string)
+    if (avgMoodValue > 4) moodCategory = 'high'
+    else if (avgMoodValue < 3) moodCategory = 'low'
     
     // Rotate through different tip types based on refresh count
     const tipType = refreshCount % 3
@@ -128,7 +129,8 @@ export default function WellnessPanel() {
     } else if (tipType === 1 && moodHistory.length > 0) {
       return moodBasedTips[moodCategory][Math.floor(Math.random() * moodBasedTips[moodCategory].length)]
     } else if (tipType === 2 && moodHistory.length > 1) {
-      return trendBasedTips[moodTrend][Math.floor(Math.random() * trendBasedTips[moodTrend].length)]
+      const trendCategory = moodTrend as 'improving' | 'declining' | 'stable'
+      return trendBasedTips[trendCategory][Math.floor(Math.random() * trendBasedTips[trendCategory].length)]
     }
     
     // Fallback to time-based tips
@@ -200,7 +202,7 @@ export default function WellnessPanel() {
       ]
     }
     
-    let timeCategory = 'midday'
+    let timeCategory: 'morning' | 'midday' | 'evening' = 'midday'
     if (currentHour < 12) timeCategory = 'morning'
     else if (currentHour > 17) timeCategory = 'evening'
     
