@@ -14,7 +14,7 @@ variables:
   buildConfiguration: 'production'
   
   # Azure App Service variables (update these with your actual values)
-  azureSubscription: 'cb6255863a-vibecode05-az' # Replace with your service connection name
+  azureSubscription: 'pulsesync-azure-connection' # Replace with your service connection name
   appServiceName: 'CTS-VibeAppau5403' # Replace with your App Service name
   resourceGroupName: 'CTS-VibeAppau540' # Replace with your resource group name
 
@@ -79,41 +79,42 @@ stages:
         publishLocation: 'Container'
       displayName: 'Publish build artifacts'
 
-- stage: Deploy
-  displayName: 'Deploy to Azure'
-  dependsOn: Build
-  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
-  jobs:
-  - deployment: DeployJob
-    displayName: 'Deploy PulseSync to Azure App Service'
-    environment: 'production'
-    strategy:
-      runOnce:
-        deploy:
-          steps:
-          - download: current
-            artifact: pulsesync-drop
-            displayName: 'Download build artifacts'
+# Temporarily disabled - uncomment after setting up service connection
+# - stage: Deploy
+#   displayName: 'Deploy to Azure'
+#   dependsOn: Build
+#   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+#   jobs:
+#   - deployment: DeployJob
+#     displayName: 'Deploy PulseSync to Azure App Service'
+#     environment: 'production'
+#     strategy:
+#       runOnce:
+#         deploy:
+#           steps:
+#           - download: current
+#             artifact: pulsesync-drop
+#             displayName: 'Download build artifacts'
 
-          - task: AzureWebApp@1
-            inputs:
-              azureSubscription: '$(azureSubscription)'
-              appType: 'webAppLinux'
-              appName: '$(appServiceName)'
-              resourceGroupName: '$(resourceGroupName)'
-              package: '$(Pipeline.Workspace)/pulsesync-drop/pulsesync-$(Build.BuildId).zip'
-              runtimeStack: 'NODE|18-lts'
-              startUpCommand: 'npm start'
-            displayName: 'Deploy to Azure App Service'
+#           - task: AzureWebApp@1
+#             inputs:
+#               azureSubscription: '$(azureSubscription)'
+#               appType: 'webAppLinux'
+#               appName: '$(appServiceName)'
+#               resourceGroupName: '$(resourceGroupName)'
+#               package: '$(Pipeline.Workspace)/pulsesync-drop/pulsesync-$(Build.BuildId).zip'
+#               runtimeStack: 'NODE|18-lts'
+#               startUpCommand: 'npm start'
+#             displayName: 'Deploy to Azure App Service'
 
-          - task: AzureAppServiceSettings@1
-            inputs:
-              azureSubscription: '$(azureSubscription)'
-              appName: '$(appServiceName)'
-              resourceGroupName: '$(resourceGroupName)'
-              appSettings: |
-                NODE_ENV=production
-                WEBSITE_NODE_DEFAULT_VERSION=18.17.0
-                SCM_DO_BUILD_DURING_DEPLOYMENT=false
-                ENABLE_ORYX_BUILD=false
-            displayName: 'Configure App Service Settings'
+#           - task: AzureAppServiceSettings@1
+#             inputs:
+#               azureSubscription: '$(azureSubscription)'
+#               appName: '$(appServiceName)'
+#               resourceGroupName: '$(resourceGroupName)'
+#               appSettings: |
+#                 NODE_ENV=production
+#                 WEBSITE_NODE_DEFAULT_VERSION=18.17.0
+#                 SCM_DO_BUILD_DURING_DEPLOYMENT=false
+#                 ENABLE_ORYX_BUILD=false
+#             displayName: 'Configure App Service Settings'
